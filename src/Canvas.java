@@ -33,6 +33,7 @@ public class Canvas {
     boolean polygonMode = false;
     boolean dashedLineMode = false;
     boolean alignMode = false;
+    boolean thickLineMode = false; // Nový režim pro tlusté čáry
 
     public Canvas(int width, int height) {
         frame = new JFrame();
@@ -67,6 +68,7 @@ public class Canvas {
             Úsečka: L
             Čárkovaná úsečka: D
             Zarovnaná úsečka: SHIFT
+            Tlustá úsečka: T
             Mazání: C
             */
         panel.addKeyListener(new KeyAdapter() {
@@ -77,17 +79,19 @@ public class Canvas {
                     clear();
                 }
                 if(e.getKeyCode() == KeyEvent.VK_L) {
-                    lineMode = !lineMode;
+                    lineMode = true;
                     polygonMode = false;
                     alignMode = false;
+                    thickLineMode = false;
                     clear();
                     panel.repaint();
                 }
                 if(e.getKeyCode() == KeyEvent.VK_P) {
                     polygon.clearPoints();
                     lineMode = false;
-                    polygonMode = !polygonMode;
+                    polygonMode = true;
                     alignMode = false;
+                    thickLineMode = false;
                     clear();
                     panel.repaint();
                 }
@@ -99,6 +103,15 @@ public class Canvas {
                     alignMode = !alignMode;
                     polygonMode = false;
                     lineMode = false;
+                    thickLineMode = false;
+                    panel.repaint();
+                }
+                if(e.getKeyCode() == KeyEvent.VK_T) { // Nový posluchač kláves pro režim tlusté čáry
+                    thickLineMode = true;
+                    lineMode = false;
+                    polygonMode = false;
+                    alignMode = false;
+                    clear();
                     panel.repaint();
                 }
             }
@@ -112,9 +125,9 @@ public class Canvas {
 
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
-                //Zadání prvního bodu u úseček
+                // Zadání prvního bodu u úseček
                 if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
-                    if (lineMode) {
+                    if (lineMode || thickLineMode) {
                         x1 = mouseEvent.getX();
                         y1 = mouseEvent.getY();
                     }
@@ -127,7 +140,7 @@ public class Canvas {
 
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
-                //Potvrzení posledního bodu
+                // Potvrzení posledního bodu
                 if (lineMode){
                     if (dashedLineMode){
                         clear();
@@ -166,6 +179,13 @@ public class Canvas {
                     linerAligned.drawLine(img, x1, y1, x2, y2, 0xff00ff);
                     panel.repaint();
                 }
+                if (thickLineMode) { // Nová podmínka pro režim tlusté čáry
+                    clear();
+                    x2 = mouseEvent.getX();
+                    y2 = mouseEvent.getY();
+                    drawThickLine(x1, y1, x2, y2, 0xff00ff, 5); // Příklad tloušťky 5
+                    panel.repaint();
+                }
             }
 
             @Override
@@ -182,7 +202,7 @@ public class Canvas {
         panel.addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent mouseEvent) {
-                //Tažení při zadávání posledního bodu
+                // Tažení při zadávání posledního bodu
                     if (lineMode) {
                         clear();
                         linerDotted.drawLine(img, x1, y1, mouseEvent.getX(), mouseEvent.getY(), 0xff00ff);
@@ -196,6 +216,11 @@ public class Canvas {
                     if (alignMode){
                         clear();
                         linerAligned.drawLine(img, x1, y1, mouseEvent.getX(), mouseEvent.getY(), 0xff00ff);
+                        panel.repaint();
+                    }
+                    if (thickLineMode) { // Nová podmínka pro režim tlusté čáry
+                        clear();
+                        drawThickLine(x1, y1, mouseEvent.getX(), mouseEvent.getY(), 0xff00ff, 5); // Příklad tloušťky 5
                         panel.repaint();
                     }
             }
@@ -224,6 +249,15 @@ public class Canvas {
     public void clear(){
         img.clear(0x2f2f2f);
         panel.repaint();
+    }
+
+    // Nová metoda pro kreslení tlustých čar
+    public void drawThickLine(double x1, double y1, double x2, double y2, int color, int thickness) {
+        // Iterace přes tloušťku a kreslení více čar posunutých o hodnotu tloušťky
+        for (int i = -thickness/2; i <= thickness/2; i++) {
+            linerTrivial.drawLine(img, x1 + i, y1, x2 + i, y2, color);
+            linerTrivial.drawLine(img, x1, y1 + i, x2, y2 + i, color);
+        }
     }
 
     public static void main(String[] args) {
