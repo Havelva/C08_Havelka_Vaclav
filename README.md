@@ -1,10 +1,8 @@
-
 ## Ovládání Aplikace
-- **Polygon (P)**: Vytvoření polygonu.
-- **Úsečka (L)**: Vytvoření úsečky.
-- **Čárkovaná úsečka (D)**: Vytvoření čárkované úsečky.
-    (Nutné nejdříve zapnout režim úsečky L)
-- **Zarovnaná úsečka (SHIFT)**: Vytvoření zarovnané úsečky při držení klávesy SHIFT.
-- **Tlustá úsečka (T)**: Vytvoření tlusté úsečky.
-- **Mazání (C)**: Mazání objektů.
-
+- **Vymazat plochu (C)**
+- **ScanLine algoritmus (S)**
+- **Ořezání polygonu (O)**
+- **Kreslení ořezového polygonu (CTRL + LMB)**
+- **SeedFill algoritmus - barva pozadí (RBM)**
+- **SeedFill algoritmus - barva hranice (CTRL + RBM)**
+- **Změnit normální polygon na ořezový (Z)**

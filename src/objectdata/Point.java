@@ -1,64 +1,35 @@
 package objectdata;
 
-/**
- * Třída představuje bod v rovině s dvojicí souřadnic x a y.
- */
 public class Point {
+    private int x, y;
 
-    /**
-     * Souřadnice x bodu.
-     */
-    public double x;
-
-    /**
-     * Souřadnice y bodu.
-     */
-    public double y;
-
-    /**
-     * Konstruktor pro vytvoření bodu s danými souřadnicemi x a y.
-     *
-     * @param x Souřadnice x bodu.
-     * @param y Souřadnice y bodu.
-     */
-    public Point(double x, double y) {
+    public Point(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    /**
-     * Vrací souřadnici x bodu.
-     *
-     * @return Souřadnice x bodu.
-     */
-    public double getX() {
+    public Point(double x, double y) {
+        this.x = (int) x;
+        this.y = (int) y;
+    }
+
+    public int getX() {
         return x;
     }
 
-    /**
-     * Vrací souřadnici y bodu.
-     *
-     * @return Souřadnice y bodu.
-     */
-    public double getY() {
+    public int getY() {
         return y;
     }
 
-    /**
-     * Nastaví novou hodnotu souřadnice x bodu.
-     *
-     * @param x Nová hodnota souřadnice x.
-     */
-    public void setX(double x) {
+    public void setX(int x) {
         this.x = x;
     }
 
-    /**
-     * Nastaví novou hodnotu souřadnice y bodu.
-     *
-     * @param y Nová hodnota souřadnice y.
-     */
-    public void setY(double y) {
+    public void setY(int y) {
         this.y = y;
+    }
+
+    public double countDistance(int x, int y) {
+        return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2));
     }
 }

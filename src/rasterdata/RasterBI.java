@@ -2,104 +2,82 @@ package rasterdata;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Optional;
 
-/**
- * Třída RasterBI implementuje rozhraní Raster a Presentable.
- * Poskytuje metody pro práci s rastrovými daty pomocí BufferedImage.
- */
-public class RasterBI implements Raster, Presentable {
-
-    /**
-     * BufferedImage objekt, který uchovává rastrová data.
-     */
+public class RasterBI implements Raster {
     private final BufferedImage img;
+    private Color color;
 
-    /**
-     * Konstruktor, který inicializuje BufferedImage s danou šířkou a výškou.
-     *
-     * @param width  Šířka obrázku.
-     * @param height Výška obrázku.
-     */
     public RasterBI(int width, int height) {
-        this.img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     }
 
-    /**
-     * Vrací šířku obrázku.
-     *
-     * @return Šířka obrázku.
-     */
+    @Override
+    public void setPixel(int x, int y, Color color) {
+        if (isOnRaster(x, y))
+            img.setRGB(x, y, color.getRGB());
+    }
+
+    @Override
+    public int getPixel(int x, int y) {
+        return img.getRGB(x, y);
+    }
+
+    public void present(Graphics g) {
+        g.drawImage(img, 0, 0, null);
+    }
+
+    @Override
+    public void clear() {
+        Graphics gr = img.getGraphics();
+        gr.setColor(Color.BLACK);
+        gr.fillRect(0, 0, getWidth(), getHeight());
+    }
+
+    public void clear(Color color) {
+        Graphics gr = img.getGraphics();
+        gr.setColor(color);
+        gr.fillRect(0, 0, getWidth(), getHeight());
+    }
+
+    public BufferedImage getImg() {
+        return img;
+    }
+
+    public Graphics getGraphics() {
+        return img.getGraphics();
+    }
+
+    public void repaint(Graphics graphics) {
+        graphics.drawImage(img, 0, 0, null);
+    }
+
+    public void draw(RasterBI raster) {
+        Graphics graphics = getGraphics();
+        graphics.setColor(color);
+        graphics.fillRect(0, 0, getWidth(), getHeight());
+        graphics.drawImage(raster.img, 0, 0, null);
+    }
+
+    @Override
+    public void setClearColor(Color color) {
+        this.color = color;
+    }
+
     @Override
     public int getWidth() {
         return img.getWidth();
     }
 
-    /**
-     * Vrací výšku obrázku.
-     *
-     * @return Výška obrázku.
-     */
     @Override
     public int getHeight() {
         return img.getHeight();
     }
 
-    /**
-     * Nastaví barvu pixelu na dané pozici.
-     *
-     * @param c     Sloupec (x-ová souřadnice).
-     * @param r     Řádek (y-ová souřadnice).
-     * @param color Barva pixelu.
-     * @return true, pokud byla barva úspěšně nastavena, jinak false.
-     */
-    @Override
-    public boolean setColor(int c, int r, int color) {
-        // Řešení boundaries
-        if (c > this.getWidth() - 1 || c < 0 || r > this.getHeight() - 1 || r < 0) {
-            return false;
-        } else {
-            img.setRGB(c, r, color);
-            return true;
-        }
+    public boolean isOnRaster(int x, int y) {
+        return x > -1 && x < getWidth() && y > -1 && y < getHeight();
     }
 
-    /**
-     * Vrací barvu pixelu na dané pozici.
-     *
-     * @param c Sloupec (x-ová souřadnice).
-     * @param r Řádek (y-ová souřadnice).
-     * @return Optional obsahující barvu pixelu, pokud je pozice platná, jinak prázdný Optional.
-     */
-    @Override
-    public Optional<Integer> getColor(int c, int r) {
-        // Řešení boundaries
-        if (c > this.getWidth() - 1 || c < 0 || r > this.getHeight() - 1 || r < 0) {
-            return Optional.empty();
-        } else {
-            return Optional.of(img.getRGB(r, c));
-        }
-    }
-
-    /**
-     * Vymaže obrázek a nastaví pozadí na danou barvu.
-     *
-     * @param background Barva pozadí.
-     */
-    @Override
-    public void clear(int background) {
-        Graphics gr = img.getGraphics();
-        gr.setColor(new Color(background));
-        gr.fillRect(0, 0, img.getWidth(), img.getHeight());
-    }
-
-    /**
-     * Prezentuje obrázek na daném grafickém kontextu.
-     *
-     * @param graphics Grafický kontext, na který se obrázek vykreslí.
-     */
-    @Override
-    public void present(Graphics graphics) {
-        graphics.drawImage(img, 0, 0, null);
+    public Color getBackgroundColor() {
+        return this.color;
     }
 }
