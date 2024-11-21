@@ -159,6 +159,10 @@ public class Canvas {
                     for (Point point : polygon.getPoints()) {
                         polygonClipper.addPoint(point);
                     }
+
+                    // Clear the normal polygon to start drawing a new one
+                    polygon.clear();
+                    rasterizePolygons();
                 } else if (e.getKeyCode() == KeyEvent.VK_O) {
                     Polygon p = new Clipper(polygonClipper, polygon, true).getClip();
 
