@@ -5,6 +5,7 @@ import fill.SeedFillerBorder;
 import objectdata.*;
 import objectdata.Point;
 import objectdata.Polygon;
+import objectdata.Pentagon;
 import rasterdata.*;
 import rasterdata.Control;
 import rasterdata.Presentable;
@@ -20,11 +21,13 @@ public class Canvas {
     private LineRasterizer lineRasterizer;
     private PolygonRasterizer polygonRasterizer;
     private RasterBI raster;
-    private final Polygon polygon;
+    private Polygon polygon;
     private final Polygon polygonClipper;
     private int currentMouseButton = -1;
     private Point polygonClosestPoint;
     private int polygonClosestPointIndex;
+    private Point startPoint;
+    private double rotationAngle = 0;
 
     public Canvas(int width, int height) {
         Presentable window = new Presentable(width, height);
@@ -56,7 +59,9 @@ public class Canvas {
                 Polygon p = e.isControlDown() ? polygonClipper : polygon;
                 currentMouseButton = e.getButton();
 
-                if (currentMouseButton == MouseEvent.BUTTON3) {
+                if (e.isShiftDown() && e.getButton() == MouseEvent.BUTTON1) {
+                    startPoint = new Point(e.getX(), e.getY());
+                } else if (currentMouseButton == MouseEvent.BUTTON3) {
                     /** moves closest point in polygon */
                     p.moveClosestPointInPolygon(mouseX, mouseY);
                     rasterizePolygons();
@@ -80,6 +85,31 @@ public class Canvas {
                     rasterizePolygons();
                 }
             }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                currentMouseButton = e.getButton();
+                Polygon p = e.isControlDown() ? polygonClipper : polygon;
+
+                if (e.isShiftDown() && e.getButton() == MouseEvent.BUTTON1) {
+                    Point endPoint = new Point(e.getX(), e.getY());
+                    int radius = (int) startPoint.countDistance(endPoint.getX(), endPoint.getY());
+                    Pentagon pentagon = new Pentagon(startPoint, radius, rotationAngle);
+                    polygon = pentagon;
+                    rasterizePolygons();
+                } else if (currentMouseButton == MouseEvent.BUTTON3) {
+                    /** resets index of the point which was moved */
+                    p.setMovePointIndex(-1);
+                } else if (currentMouseButton == MouseEvent.BUTTON1) {
+                    /** pushes new point to the polygon */
+                    int mouseX = e.getX();
+                    int mouseY = e.getY();
+
+                    Point point = new Point(mouseX, mouseY);
+                    p.addPoint(point, p.getCount() < 2 ? p.getCount() : polygonClosestPointIndex);
+                    rasterizePolygons();
+                }
+            }
         });
 
         panel.addMouseMotionListener(new MouseAdapter() {
@@ -90,7 +120,14 @@ public class Canvas {
 
                 Polygon p = e.isControlDown() ? polygonClipper : polygon;
 
-                if (currentMouseButton == MouseEvent.BUTTON3) {
+                if (e.isShiftDown() && currentMouseButton == MouseEvent.BUTTON1) {
+                    Point endPoint = new Point(e.getX(), e.getY());
+                    int radius = (int) startPoint.countDistance(endPoint.getX(), endPoint.getY());
+                    rotationAngle = Math.atan2(endPoint.getY() - startPoint.getY(), endPoint.getX() - startPoint.getX());
+                    Pentagon pentagon = new Pentagon(startPoint, radius, rotationAngle);
+                    polygon = pentagon;
+                    rasterizePolygons();
+                } else if (currentMouseButton == MouseEvent.BUTTON3) {
                     /** moves the closest point in a polygon */
                     int polygonMovePointIndex = p.getMovePointIndex();
 
@@ -119,27 +156,6 @@ public class Canvas {
                         line2.setColor(Color.CYAN);
                         lineRasterizer.rasterize(line2);
                     }
-                }
-            }
-        });
-
-        panel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                currentMouseButton = e.getButton();
-                Polygon p = e.isControlDown() ? polygonClipper : polygon;
-
-                if (currentMouseButton == MouseEvent.BUTTON3) {
-                    /** resets index of the point which was moved */
-                    p.setMovePointIndex(-1);
-                } else if (currentMouseButton == MouseEvent.BUTTON1) {
-                    /** pushes new point to the polygon */
-                    int mouseX = e.getX();
-                    int mouseY = e.getY();
-
-                    Point point = new Point(mouseX, mouseY);
-                    p.addPoint(point, p.getCount() < 2 ? p.getCount() : polygonClosestPointIndex);
-                    rasterizePolygons();
                 }
             }
         });
@@ -191,7 +207,9 @@ public class Canvas {
 
     private void rasterizePolygons() {
         panel.clear();
-        polygonRasterizer.rasterize(polygon);
+        if (polygon != null) {
+            polygonRasterizer.rasterize(polygon);
+        }
         polygonRasterizer.rasterize(polygonClipper);
     }
 
