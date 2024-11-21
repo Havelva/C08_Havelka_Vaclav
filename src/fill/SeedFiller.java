@@ -3,6 +3,7 @@ package fill;
 import rasterdata.RasterBI;
 
 import java.awt.*;
+import java.util.Stack;
 
 public class SeedFiller implements Filler {
     private final int x;
@@ -24,19 +25,29 @@ public class SeedFiller implements Filler {
         seedFill(x, y);
     }
 
-    private void seedFill(int x, int y) {
-        if (!raster.isOnRaster(x, y))
-            return;
+    private void seedFill(int startX, int startY) {
+        Stack<Point> stack = new Stack<>();
+        stack.push(new Point(startX, startY));
 
-        Color color = new Color(raster.getPixel(x, y));
+        while (!stack.isEmpty()) {
+            Point p = stack.pop();
+            int x = p.x;
+            int y = p.y;
 
-        if (color.equals(backgroundColor)) {
-            raster.setPixel(x, y, fillColor);
+            if (!raster.isOnRaster(x, y)) {
+                continue;
+            }
 
-            seedFill(x + 1, y);
-            seedFill(x - 1, y);
-            seedFill(x, y + 1);
-            seedFill(x, y - 1);
+            Color color = new Color(raster.getPixel(x, y));
+
+            if (color.equals(backgroundColor)) {
+                raster.setPixel(x, y, fillColor);
+
+                stack.push(new Point(x + 1, y));
+                stack.push(new Point(x - 1, y));
+                stack.push(new Point(x, y + 1));
+                stack.push(new Point(x, y - 1));
+            }
         }
     }
 }
