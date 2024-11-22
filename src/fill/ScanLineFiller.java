@@ -16,6 +16,8 @@ public class ScanLineFiller implements Filler {
     private final Polygon polygon;
     private final ArrayList<Point> points;
 
+    private static final int CHECKER_SIZE = 20;
+
     public ScanLineFiller(Polygon polygon, LineRasterizer lineRasterizer, PolygonRasterizer polygonRasterizer) {
         this.lineRasterizer = lineRasterizer;
         this.polygonRasterizer = polygonRasterizer;
@@ -67,21 +69,22 @@ public class ScanLineFiller implements Filler {
                 }
             }
 
-            for (int i = 0; i < intersections.size() - 1; i++) {
-                for (int j = 0; j < intersections.size() - i - 1; j++) {
-                    if (intersections.get(j) > intersections.get(j + 1)) {
-                        int biggerX = intersections.get(j);
-                        intersections.set(j, intersections.get(j + 1));
-                        intersections.set(j + 1, biggerX);
+            intersections.sort(Integer::compareTo);
+
+            for (int i = 0; i < intersections.size(); i += 2) {
+                int x1 = intersections.get(i);
+                int x2 = intersections.get(i + 1);
+                for (int x = x1; x < x2; x++) {
+                    if (isCheckerboard(x, y)) {
+                        lineRasterizer.rasterize(new Line(x, y, x + 1, y));
                     }
                 }
             }
-
-            for (int i = 0; i < intersections.size(); i += 2) {
-                Line line = new Line(intersections.get(i), y, intersections.get(i + 1), y);
-                lineRasterizer.rasterize(line);
-            }
         }
         polygonRasterizer.rasterize(polygon);
+    }
+
+    private boolean isCheckerboard(int x, int y) {
+        return ((x / CHECKER_SIZE) % 2 == (y / CHECKER_SIZE) % 2);
     }
 }
