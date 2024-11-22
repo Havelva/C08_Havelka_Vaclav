@@ -12,6 +12,7 @@ public class SeedFillerBorder implements Filler {
     private final Color fillColor, stopColor1, stopColor2;
     private final RasterBI raster;
 
+    // Konstruktor třídy SeedFillerBorder, inicializuje počáteční souřadnice, barvy a raster
     public SeedFillerBorder(int x, int y, Color fillColor, Color stopColor1, Color stopColor2, RasterBI raster) {
         this.x = x;
         this.y = y;
@@ -21,11 +22,13 @@ public class SeedFillerBorder implements Filler {
         this.raster = raster;
     }
 
+    // Metoda pro spuštění vyplňování
     @Override
     public void fill() {
         seedFill(x, y);
     }
 
+    // Metoda pro vyplňování pomocí algoritmu seed fill
     private void seedFill(int startX, int startY) {
         Queue<int[]> queue = new LinkedList<>();
         boolean[][] processed = new boolean[raster.getWidth()][raster.getHeight()];
@@ -43,6 +46,7 @@ public class SeedFillerBorder implements Filler {
 
             Color color = new Color(raster.getPixel(x, y));
 
+            // Pokud barva není stopColor1, stopColor2 nebo fillColor, vyplníme pixel
             if (!color.equals(stopColor1) && !color.equals(stopColor2) && !color.equals(fillColor)) {
                 raster.setPixel(x, y, getPatternColor(x, y));
 
@@ -53,6 +57,7 @@ public class SeedFillerBorder implements Filler {
                     {x, y - 1}
                 };
 
+                // Přidání sousedních pixelů do fronty, pokud ještě nebyly zpracovány
                 for (int[] neighbor : neighbors) {
                     int nx = neighbor[0];
                     int ny = neighbor[1];
@@ -65,8 +70,8 @@ public class SeedFillerBorder implements Filler {
         }
     }
 
+    // Metoda pro získání barvy vzoru (např. šachovnice)
     private Color getPatternColor(int x, int y) {
-        // Example pattern: checkerboard
         int patternSize = 10;
         boolean isEven = ((x / patternSize) % 2 == (y / patternSize) % 2);
         return isEven ? fillColor : fillColor.darker();

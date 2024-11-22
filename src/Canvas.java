@@ -28,7 +28,7 @@ public class Canvas {
     private int polygonClosestPointIndex;
     private Point startPoint;
     private double rotationAngle = 0;
-    private boolean drawingLineMode = false; // New mode flag
+    private boolean drawingLineMode = false; // Nový příznak režimu
 
     public Canvas(int width, int height) {
         Presentable window = new Presentable(width, height);
@@ -50,6 +50,7 @@ public class Canvas {
         resizeListener();
     }
 
+    // Metoda pro nastavení posluchačů myši pro práci s polygonem
     private void polygonListeners() {
         panel.addMouseListener(new MouseAdapter() {
             @Override
@@ -63,28 +64,28 @@ public class Canvas {
                 if (e.isShiftDown() && e.getButton() == MouseEvent.BUTTON1) {
                     startPoint = new Point(e.getX(), e.getY());
                 } else if (e.isShiftDown() && e.getButton() == MouseEvent.BUTTON3) {
-                    drawingLineMode = true; // Enable line drawing mode
+                    drawingLineMode = true; // Povolit režim kreslení čáry
                     startPoint = new Point(e.getX(), e.getY());
                 } else if (currentMouseButton == MouseEvent.BUTTON3) {
-                    /** moves closest point in polygon */
+                    // Pohybuje nejbližším bodem v polygonu
                     p.moveClosestPointInPolygon(mouseX, mouseY);
                     rasterizePolygons();
 
-                    /** fills polygon from cursor */
+                    // Vyplňuje polygon od kurzoru
                     if (e.isControlDown()) {
                         new SeedFillerBorder(mouseX, mouseY, Color.ORANGE, polygon.getColor(), polygonClipper.getColor(), raster).fill();
                     } else {
                         new SeedFiller(mouseX, mouseY, Color.BLUE, raster).fill();
                     }
                 } else if (currentMouseButton == MouseEvent.BUTTON1) {
-                    /** saves the closest point in polygon for another listener */
+                    // Ukládá nejbližší bod v polygonu pro jiný listener
                     if (p.getCount() < 1)
                         return;
 
                     polygonClosestPoint = p.getClosestPoint(mouseX, mouseY);
                     polygonClosestPointIndex = p.getPointIndex(polygonClosestPoint);
                 } else if (currentMouseButton == MouseEvent.BUTTON2) {
-                    /** removes the closest point in a polygon */
+                    // Odstraňuje nejbližší bod v polygonu
                     p.removeClosestPoint(mouseX, mouseY);
                     rasterizePolygons();
                 }
@@ -98,9 +99,9 @@ public class Canvas {
                 if (drawingLineMode && e.getButton() == MouseEvent.BUTTON3) {
                     Point endPoint = new Point(e.getX(), e.getY());
                     Line line = new Line(startPoint, endPoint);
-                    line.setColor(Color.CYAN); // Set line color
+                    line.setColor(Color.CYAN); // Nastavit barvu čáry
                     lineRasterizer.rasterize(line);
-                    drawingLineMode = false; // Disable line drawing mode
+                    drawingLineMode = false; // Zakázat režim kreslení čáry
                 } else if (e.isShiftDown() && e.getButton() == MouseEvent.BUTTON1) {
                     Point endPoint = new Point(e.getX(), e.getY());
                     int radius = (int) startPoint.countDistance(endPoint.getX(), endPoint.getY());
@@ -108,10 +109,10 @@ public class Canvas {
                     polygon = pentagon;
                     rasterizePolygons();
                 } else if (currentMouseButton == MouseEvent.BUTTON3) {
-                    /** resets index of the point which was moved */
+                    // Resetuje index bodu, který byl přesunut
                     p.setMovePointIndex(-1);
                 } else if (currentMouseButton == MouseEvent.BUTTON1) {
-                    /** pushes new point to the polygon */
+                    // Přidává nový bod do polygonu
                     int mouseX = e.getX();
                     int mouseY = e.getY();
 
@@ -140,12 +141,12 @@ public class Canvas {
                 } else if (drawingLineMode && currentMouseButton == MouseEvent.BUTTON3) {
                     Point endPoint = new Point(e.getX(), e.getY());
                     Line line = new Line(startPoint, endPoint);
-                    line.setType("dashed"); // Set line type
-                    line.setColor(Color.CYAN); // Set line color
+                    line.setType("dashed"); // Nastavit typ čáry
+                    line.setColor(Color.CYAN); // Nastavit barvu čáry
                     rasterizePolygons();
                     lineRasterizer.rasterize(line);
                 } else if (currentMouseButton == MouseEvent.BUTTON3) {
-                    /** moves the closest point in a polygon */
+                    // Pohybuje nejbližším bodem v polygonu
                     int polygonMovePointIndex = p.getMovePointIndex();
 
                     if (polygonMovePointIndex != -1) {
@@ -154,7 +155,7 @@ public class Canvas {
                         rasterizePolygons();
                     }
                 } else if (currentMouseButton == MouseEvent.BUTTON1) {
-                    /** rasterize preview dashed lines to the new point in a polygon */
+                    // Rasterizuje náhled přerušovaných čar k novému bodu v polygonu
                     if (p.getCount() < 1)
                         return;
 
@@ -178,6 +179,7 @@ public class Canvas {
         });
     }
 
+    // Metoda pro nastavení posluchačů klávesnice
     private void keyEventListeners() {
         panel.addKeyListener(new KeyAdapter() {
             @Override
@@ -193,7 +195,7 @@ public class Canvas {
                         polygonClipper.addPoint(point);
                     }
 
-                    // Clear the normal polygon to start drawing a new one
+                    // Vymazat normální polygon pro začátek kreslení nového
                     polygon.clear();
                     rasterizePolygons();
                 } else if (e.getKeyCode() == KeyEvent.VK_O) {
@@ -211,6 +213,7 @@ public class Canvas {
         });
     }
 
+    // Metoda pro nastavení posluchače změny velikosti okna
     private void resizeListener() {
         panel.addComponentListener(new ComponentAdapter() {
             @Override
@@ -222,6 +225,7 @@ public class Canvas {
         });
     }
 
+    // Metoda pro rasterizaci polygonů
     private void rasterizePolygons() {
         panel.clear();
         if (polygon != null) {
@@ -230,6 +234,7 @@ public class Canvas {
         polygonRasterizer.rasterize(polygonClipper);
     }
 
+    // Metoda pro vymazání všech struktur
     private void clearAllStructures() {
         currentMouseButton = -1;
         polygonClosestPoint = null;
@@ -238,11 +243,14 @@ public class Canvas {
         panel.clear();
     }
 
+    // Metoda pro spuštění aplikace
     public void start() {
         raster.clear(Color.BLACK);
         panel.repaint();
         panel.printLegend();
     }
+
+    // Hlavní metoda pro spuštění aplikace
     public static void main(String[] args) {
         new Canvas(800, 600).start();
     }
