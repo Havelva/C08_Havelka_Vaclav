@@ -69,12 +69,15 @@ public class Control extends JPanel {
     public void printLegend() {
         Graphics gr = raster.getGraphics();
 
-        gr.drawString("Vymazat plochu[C]", 5, 15);
-        gr.drawString("ScanLine algoritmus [S]", 5, 30);
-        gr.drawString("Ořezání polygonu [O]", 5, 45);
-        gr.drawString("Kreslení ořezového polygonu [CTRL + LMB]", 5, 60);
-        gr.drawString("SeedFill algoritmus - barva pozadí [RBM]", 5, 75);
-        gr.drawString("SeedFill algoritmus - barva hranice [CTRL + RMB]", 5, 90);
-        gr.drawString("Změnit normální polygon na ořezový [Z]", 5, 105);
+    gr.drawString("Kreslení bežného polygonu (LMB)", 5, 15);
+    gr.drawString("Kreslení ořezového polygonu (CTRL + LMB)", 5, 30);
+    gr.drawString("SeedFill algoritmus - barva pozadí (RBM)", 5, 45);
+    gr.drawString("SeedFill algoritmus - barva hranice (CTRL + RBM)", 5, 60);
+    gr.drawString("Kreslení pravidelného pětiúhelníku (SHIFT + LMB)", 5, 75);
+    gr.drawString("Kreslení samotné úsečky (SHIFT + RMB)", 5, 90);
+    gr.drawString("Změnit normální polygon na ořezový (Z)", 5, 105);
+    gr.drawString("ScanLine algoritmus (S)", 5, 120);
+    gr.drawString("Ořezání polygonu (O)", 5, 135);
+    gr.drawString("Vymazat plochu (C)", 5, 150);
     }
 }

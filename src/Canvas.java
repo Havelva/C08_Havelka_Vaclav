@@ -28,6 +28,7 @@ public class Canvas {
     private int polygonClosestPointIndex;
     private Point startPoint;
     private double rotationAngle = 0;
+    private boolean drawingLineMode = false; // New mode flag
 
     public Canvas(int width, int height) {
         Presentable window = new Presentable(width, height);
@@ -61,6 +62,9 @@ public class Canvas {
 
                 if (e.isShiftDown() && e.getButton() == MouseEvent.BUTTON1) {
                     startPoint = new Point(e.getX(), e.getY());
+                } else if (e.isShiftDown() && e.getButton() == MouseEvent.BUTTON3) {
+                    drawingLineMode = true; // Enable line drawing mode
+                    startPoint = new Point(e.getX(), e.getY());
                 } else if (currentMouseButton == MouseEvent.BUTTON3) {
                     /** moves closest point in polygon */
                     p.moveClosestPointInPolygon(mouseX, mouseY);
@@ -91,7 +95,13 @@ public class Canvas {
                 currentMouseButton = e.getButton();
                 Polygon p = e.isControlDown() ? polygonClipper : polygon;
 
-                if (e.isShiftDown() && e.getButton() == MouseEvent.BUTTON1) {
+                if (drawingLineMode && e.getButton() == MouseEvent.BUTTON3) {
+                    Point endPoint = new Point(e.getX(), e.getY());
+                    Line line = new Line(startPoint, endPoint);
+                    line.setColor(Color.CYAN); // Set line color
+                    lineRasterizer.rasterize(line);
+                    drawingLineMode = false; // Disable line drawing mode
+                } else if (e.isShiftDown() && e.getButton() == MouseEvent.BUTTON1) {
                     Point endPoint = new Point(e.getX(), e.getY());
                     int radius = (int) startPoint.countDistance(endPoint.getX(), endPoint.getY());
                     Pentagon pentagon = new Pentagon(startPoint, radius, rotationAngle);
@@ -127,6 +137,13 @@ public class Canvas {
                     Pentagon pentagon = new Pentagon(startPoint, radius, rotationAngle);
                     polygon = pentagon;
                     rasterizePolygons();
+                } else if (drawingLineMode && currentMouseButton == MouseEvent.BUTTON3) {
+                    Point endPoint = new Point(e.getX(), e.getY());
+                    Line line = new Line(startPoint, endPoint);
+                    line.setType("dashed"); // Set line type
+                    line.setColor(Color.CYAN); // Set line color
+                    rasterizePolygons();
+                    lineRasterizer.rasterize(line);
                 } else if (currentMouseButton == MouseEvent.BUTTON3) {
                     /** moves the closest point in a polygon */
                     int polygonMovePointIndex = p.getMovePointIndex();

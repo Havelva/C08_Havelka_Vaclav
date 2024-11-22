@@ -1,8 +1,11 @@
 ## Ovládání Aplikace
-- **Vymazat plochu (C)**
-- **ScanLine algoritmus (S)**
-- **Ořezání polygonu (O)**
+- **Kreslení bežného polygonu (LMB)**
 - **Kreslení ořezového polygonu (CTRL + LMB)**
 - **SeedFill algoritmus - barva pozadí (RBM)**
 - **SeedFill algoritmus - barva hranice (CTRL + RBM)**
+- **Kreslení pravidelného pětiúhelníku (SHIFT + LMB)**
+- **Kreslení samotné úsečky (SHIFT + RMB)**
 - **Změnit normální polygon na ořezový (Z)**
+- **ScanLine algoritmus (S)**
+- **Ořezání polygonu (O)**
+- **Vymazat plochu (C)**
