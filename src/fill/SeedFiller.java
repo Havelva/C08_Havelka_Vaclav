@@ -9,7 +9,6 @@ public class SeedFiller implements Filler {
     private final int x;
     private final int y;
     private final Color fillColor, backgroundColor;
-
     private final RasterBI raster;
 
     public SeedFiller(int x, int y, Color fillColor, RasterBI raster) {
@@ -41,7 +40,7 @@ public class SeedFiller implements Filler {
             Color color = new Color(raster.getPixel(x, y));
 
             if (color.equals(backgroundColor)) {
-                raster.setPixel(x, y, fillColor);
+                raster.setPixel(x, y, getPatternColor(x, y));
 
                 stack.push(new Point(x + 1, y));
                 stack.push(new Point(x - 1, y));
@@ -49,5 +48,12 @@ public class SeedFiller implements Filler {
                 stack.push(new Point(x, y - 1));
             }
         }
+    }
+
+    private Color getPatternColor(int x, int y) {
+        // Example pattern: checkerboard
+        int patternSize = 10;
+        boolean isEven = ((x / patternSize) % 2 == (y / patternSize) % 2);
+        return isEven ? fillColor : fillColor.darker();
     }
 }
