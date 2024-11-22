@@ -7,6 +7,7 @@ import objectdata.Polygon;
 import rasterops.LineRasterizer;
 import rasterops.PolygonRasterizer;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,9 +76,10 @@ public class ScanLineFiller implements Filler {
                 int x1 = intersections.get(i);
                 int x2 = intersections.get(i + 1);
                 for (int x = x1; x < x2; x++) {
-                    if (isCheckerboard(x, y)) {
-                        lineRasterizer.rasterize(new Line(x, y, x + 1, y));
-                    }
+                    Color color = isCheckerboard(x, y) ? Color.BLACK : Color.WHITE;
+                    Line line = new Line(x, y, x + 1, y);
+                    line.setColor(color);
+                    lineRasterizer.rasterize(line);
                 }
             }
         }
